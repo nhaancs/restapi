@@ -1,0 +1,10 @@
+auth:
+  secret: "secret"
+db:
+  addr: "localhost:3306"
+  name: "restapidb"
+  user: "user"
+  pass: "password"
+redis:
+  addr: "localhost:6379"
+  pass: "password"

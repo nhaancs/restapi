@@ -1,0 +1,12 @@
+mode: atomic
+restapi/pkg/config/config.go:32.50,36.56 3 5
+restapi/pkg/config/config.go:36.56,38.3 1 0
+restapi/pkg/config/config.go:40.2,40.44 1 5
+restapi/pkg/config/config.go:40.44,42.3 1 0
+restapi/pkg/config/config.go:44.2,45.41 2 5
+restapi/pkg/config/config.go:45.41,46.50 1 2
+restapi/pkg/config/config.go:46.50,48.4 1 0
+restapi/pkg/config/config.go:49.3,49.93 1 2
+restapi/pkg/config/config.go:52.2,55.44 3 5
+restapi/pkg/config/config.go:55.44,57.3 1 0
+restapi/pkg/config/config.go:59.2,59.12 1 5
