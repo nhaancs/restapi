@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"restapi/pkg/appconst"
 	"restapi/pkg/apperr"
+	"restapi/pkg/metric"
+	"strconv"
 )
 
 type Response struct {
@@ -14,9 +16,10 @@ type Response struct {
 }
 
 func Error(c *gin.Context, err error) {
-	c.Header("Content-Type", "application/json")
 	appErr := apperr.Convert(err)
+	metric.Server().Inc(c.FullPath(), strconv.Itoa(appErr.Status()), appErr.Code())
 
+	c.Header("Content-Type", "application/json")
 	c.AbortWithStatusJSON(
 		appErr.Status(),
 		Response{
@@ -27,6 +30,8 @@ func Error(c *gin.Context, err error) {
 }
 
 func Success(c *gin.Context, data interface{}) {
+	metric.Server().Inc(c.FullPath(), strconv.Itoa(http.StatusOK), appconst.CodeSuccess)
+
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, Response{
 		Code:    appconst.CodeSuccess,

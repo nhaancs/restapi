@@ -1,5 +1,26 @@
 version: "3.9"
+
 services:
+  prometheus:
+    image: prom/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./zarf/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=user
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    volumes:
+      - ./zarf/grafana:/etc/grafana/provisioning/datasources
   cache:
     image: redis:6.2-alpine
     restart: always
@@ -26,3 +47,5 @@ services:
       - '3306:3306'
     volumes:
       - ~/docker-volumes/restapi-db:/var/lib/mysql
+volumes:
+  prom_data:

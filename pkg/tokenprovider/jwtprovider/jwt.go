@@ -4,7 +4,7 @@ import (
 	"restapi/pkg/tokenprovider"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type jwtProvider struct {
@@ -17,16 +17,16 @@ func New(secret string) *jwtProvider {
 
 type myClaims struct {
 	Payload tokenprovider.TokenPayload `json:"payload"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func (j *jwtProvider) Generate(payload tokenprovider.TokenPayload, expiryInSeconds int64) (*tokenprovider.Token, error) {
 	// generate the JWT
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
 		payload,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Second * time.Duration(expiryInSeconds)).Unix(),
-			IssuedAt:  time.Now().Local().Unix(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Local().Add(time.Second * time.Duration(expiryInSeconds))),
+			IssuedAt:  jwt.NewNumericDate(time.Now().Local()),
 		},
 	})
 

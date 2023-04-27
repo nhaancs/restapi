@@ -1,5 +1,8 @@
-env:
+envup:
 	docker-compose start || docker-compose up -d
+
+envdown:
+	docker compose down -v
 
 migrate:
 	go run migration/main.go

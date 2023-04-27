@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
+	"restapi/middleware"
 	"restapi/module/user/userbusiness"
 	"restapi/module/user/userstore"
 	"restapi/module/user/usertransport"
@@ -16,7 +18,9 @@ import (
 	"restapi/pkg/database"
 	"restapi/pkg/logger"
 	"restapi/pkg/md5hasher"
+	"restapi/pkg/metric"
 	"restapi/pkg/tokenprovider/jwtprovider"
+	"restapi/pkg/tracing"
 	"runtime"
 	"syscall"
 	"time"
@@ -36,6 +40,10 @@ type appConfig struct {
 		Addr string
 		Pass string
 	}
+	Trace struct {
+		Addr        string
+		ServiceName string `mapstructure:"service_name"`
+	}
 }
 
 func main() {
@@ -47,7 +55,7 @@ func main() {
 	defer log.Sync()
 
 	if err := run(log); err != nil {
-		log.Fatal("failed to start service: ", err)
+		log.Fatal("service error: ", err)
 	}
 }
 
@@ -59,18 +67,34 @@ func run(log *zap.SugaredLogger) error {
 	}
 	log.Info("GOMAXPROCS: ", runtime.GOMAXPROCS(0))
 
+	// load app configs
 	var cfg appConfig
 	if err := config.Load("config.yaml", &cfg); err != nil {
-		fmt.Errorf("error loading config: %+v", err)
+		return fmt.Errorf("error loading config: %+v", err)
 	}
 	log.Infof("loaded config: %+v", cfg)
 
+	// Init tracing
+	if err := tracing.Init(tracing.Config{
+		Address: cfg.Trace.Addr,
+		Name:    cfg.Trace.ServiceName,
+	}); err != nil {
+		return fmt.Errorf("init tracing error: %v", err)
+	}
+
+	// setup gin engine
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(gin.Recovery())
-	r.Use(gin.Logger())
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	r.Use(
+		gin.Recovery(),
+		middleware.Tracing(),
+		middleware.Logging(log),
+		middleware.Metric(),
+	)
 	v1 := r.Group("v1")
 
+	// connect to db
 	db, err := database.Connect(database.Config{
 		Addr: cfg.DB.Addr,
 		Name: cfg.DB.Name,
@@ -81,7 +105,9 @@ func run(log *zap.SugaredLogger) error {
 		return fmt.Errorf("failed to connect database: %+v", err)
 	}
 	defer db.Close()
+	metric.RegisterDB(db.DB, cfg.DB.Name)
 
+	// setup user
 	userBusiness := userbusiness.New(
 		log,
 		userstore.New(db),
@@ -126,6 +152,11 @@ func run(log *zap.SugaredLogger) error {
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
+
+		log.Info("shutdown tracing")
+		if err := tracing.Close(ctx); err != nil {
+			log.Errorf("shutting down tracing failed: %+v", err)
+		}
 
 		// Asking listener to shut down and shed load.
 		if err := app.Shutdown(ctx); err != nil {

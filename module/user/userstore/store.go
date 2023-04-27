@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"restapi/module/user/usermodel"
+	"restapi/pkg/metric"
+	"restapi/pkg/tracing"
 )
 
 var ErrNotFound = errors.New("user not found")
@@ -48,7 +50,15 @@ func New(db *sqlx.DB) *store {
 	}
 }
 
+const name = "user.store"
+
 func (s *store) FindByUsername(ctx context.Context, username string) (*usermodel.User, error) {
+	ctx = tracing.StartSpan(ctx, "userstore.FindByUsername")
+	defer tracing.EndSpan(ctx)
+
+	end := metric.Store().Start(name, "FindByUsername")
+	defer end()
+
 	cmd := fmt.Sprintf(`SELECT username, hashed_password, salt FROM %s WHERE username = ?`, s.tbl)
 	var row userRow
 	if err := s.db.GetContext(ctx, &row, cmd, username); err != nil {
@@ -62,6 +72,12 @@ func (s *store) FindByUsername(ctx context.Context, username string) (*usermodel
 }
 
 func (s *store) Insert(ctx context.Context, user *usermodel.User) error {
+	ctx = tracing.StartSpan(ctx, "userstore.Insert")
+	defer tracing.EndSpan(ctx)
+
+	end := metric.Store().Start(name, "Insert")
+	defer end()
+
 	cmd := fmt.Sprintf(`INSERT INTO %s (username, hashed_password, salt) VALUES (:username, :hashed_password, :salt)`, s.tbl)
 	row := toUserRow(user)
 	if _, err := s.db.NamedQueryContext(ctx, cmd, row); err != nil {
