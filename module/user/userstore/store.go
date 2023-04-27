@@ -80,7 +80,7 @@ func (s *store) Insert(ctx context.Context, user *usermodel.User) error {
 
 	cmd := fmt.Sprintf(`INSERT INTO %s (username, hashed_password, salt) VALUES (:username, :hashed_password, :salt)`, s.tbl)
 	row := toUserRow(user)
-	if _, err := s.db.NamedQueryContext(ctx, cmd, row); err != nil {
+	if _, err := s.db.NamedExecContext(ctx, cmd, row); err != nil {
 		return err
 	}
 	return nil
