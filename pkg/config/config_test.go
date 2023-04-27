@@ -22,16 +22,6 @@ type Config struct {
 }
 
 var (
-	defaultConfig = func() Config {
-		var c Config
-		c.Mode = "local"
-		c.App.Name = "refund-core"
-		c.App.Port = 8000
-		c.Cache.Enable = false
-		c.Cache.ExpiredMinute = 0
-		return c
-	}
-
 	configFile = "./testdata/full.yaml"
 	// yamlFullConfig return the config associate with the configFile
 	yamlFullConfig = func() Config {
@@ -45,12 +35,10 @@ var (
 	}
 )
 
-func TestLoadDefaultConfig(t *testing.T) {
-	c := defaultConfig()
+func TestLoadNotExistedConfigFile(t *testing.T) {
+	var c Config
 	err := config.Load("./abc.yaml", &c)
-	require.NoError(t, err)
-
-	assert.Equal(t, defaultConfig(), c)
+	require.Error(t, err)
 }
 
 func TestLoadFullFromYaml(t *testing.T) {
@@ -82,18 +70,6 @@ func TestLoadConfigHasUnderscoreFromEnv(t *testing.T) {
 
 	want := yamlFullConfig()
 	want.Cache.ExpiredMinute = 15
-	assert.Equal(t, want, c)
-}
-
-func TestMissingConfigFileShouldUseDefaultAndEnv(t *testing.T) {
-	setEnv(t, "MODE", "prod")
-
-	c := defaultConfig()
-	err := config.Load("./testdata/abc.yaml", &c)
-	require.NoError(t, err)
-
-	want := defaultConfig()
-	want.Mode = "prod"
 	assert.Equal(t, want, c)
 }
 
