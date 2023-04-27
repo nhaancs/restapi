@@ -11,6 +11,9 @@ import (
 	"os"
 	"os/signal"
 	"restapi/middleware"
+	"restapi/module/product/productbusiness"
+	"restapi/module/product/productstore"
+	"restapi/module/product/producttransport"
 	"restapi/module/user/userbusiness"
 	"restapi/module/user/userstore"
 	"restapi/module/user/usertransport"
@@ -115,6 +118,11 @@ func run(log logging.Logger) error {
 		userBusiness,
 	)
 	userTransport.SetupRoutes(v1)
+
+	// setup product
+	productBusiness := productbusiness.New(productstore.New(db))
+	productTranport := producttransport.New(productBusiness)
+	productTranport.SetupRoutes(v1)
 
 	// Construct a server to service the requests.
 	app := http.Server{
