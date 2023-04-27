@@ -16,8 +16,8 @@ import (
 	"testing"
 )
 
-func (s *transportSuite) TestTransportSuite_Register() {
-	registerReq := usermodel.RegisterReq{
+func (s *transportSuite) TestTransportSuite_Login() {
+	loginReq := usermodel.LoginReq{
 		Username: "username",
 		Password: "password",
 	}
@@ -30,12 +30,12 @@ func (s *transportSuite) TestTransportSuite_Register() {
 		{
 			name: "success",
 			args: func() io.Reader {
-				data, _ := json.Marshal(registerReq)
+				data, _ := json.Marshal(loginReq)
 				return bytes.NewReader(data)
 			},
 			status: http.StatusOK,
 			mock: func() {
-				s.userBusiness.On("Register", mock.Anything, mock.Anything).Return(&usermodel.RegisterRes{}, nil).Times(1)
+				s.userBusiness.On("Login", mock.Anything, mock.Anything).Return(&usermodel.LoginRes{}, nil).Times(1)
 			},
 		},
 		{
@@ -50,7 +50,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 		{
 			name: "missing username",
 			args: func() io.Reader {
-				invalidReq := registerReq
+				invalidReq := loginReq
 				invalidReq.Username = ""
 				data, _ := json.Marshal(invalidReq)
 				return bytes.NewReader(data)
@@ -62,7 +62,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 		{
 			name: "missing password",
 			args: func() io.Reader {
-				invalidReq := registerReq
+				invalidReq := loginReq
 				invalidReq.Password = ""
 				data, _ := json.Marshal(invalidReq)
 				return bytes.NewReader(data)
@@ -72,14 +72,14 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			},
 		},
 		{
-			name: "failed to do register business",
+			name: "failed to do login business",
 			args: func() io.Reader {
-				data, _ := json.Marshal(registerReq)
+				data, _ := json.Marshal(loginReq)
 				return bytes.NewReader(data)
 			},
 			status: http.StatusBadRequest,
 			mock: func() {
-				s.userBusiness.On("Register", mock.Anything, mock.Anything).
+				s.userBusiness.On("Login", mock.Anything, mock.Anything).
 					Return(nil, apperr.Wrap(nil, appconst.CodeBadRequest, "", http.StatusBadRequest)).Times(1)
 			},
 		},
@@ -93,7 +93,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 		t.Run(c.name, func(t *testing.T) {
 			c.mock()
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/v1/users/register", c.args())
+			req, _ := http.NewRequest(http.MethodPost, "/v1/users/login", c.args())
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, c.status, w.Code)

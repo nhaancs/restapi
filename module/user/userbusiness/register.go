@@ -18,7 +18,7 @@ func (b *business) Register(ctx context.Context, req *usermodel.RegisterReq) (*u
 		return nil, err
 	}
 	if user != nil {
-		return nil, apperr.Wrap(err, appconst.CodeBadRequest, "username is already existed", http.StatusBadRequest)
+		return nil, apperr.Wrap(nil, appconst.CodeBadRequest, "username is already existed", http.StatusBadRequest)
 	}
 
 	salt := salt.GenSalt(50)
