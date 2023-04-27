@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-func (s *transportSuite) TestTransportSuite_Register() {
+func (s *transportSuite) TestTransportSuite_Create() {
 	req := productmodel.CreateReq{
 		Name: "product name",
 	}
