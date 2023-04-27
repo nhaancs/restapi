@@ -14,7 +14,7 @@ func (t *transport) Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// parse request body
 		var req usermodel.LoginReq
-		if err := c.ShouldBind(&req); err != nil {
+		if err := c.ShouldBindJSON(&req); err != nil {
 			response.Error(c, apperr.Wrap(err, appconst.CodeBadRequest, "bad request", http.StatusBadRequest))
 			return
 		}

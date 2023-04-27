@@ -14,7 +14,7 @@ func (t *transport) Register() func(*gin.Context) {
 	return func(c *gin.Context) {
 		// parse request body
 		var req usermodel.RegisterReq
-		if err := c.ShouldBind(&req); err != nil {
+		if err := c.ShouldBindJSON(&req); err != nil {
 			response.Error(c, apperr.Wrap(err, appconst.CodeBadRequest, "bad request", http.StatusBadRequest))
 			return
 		}
