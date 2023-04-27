@@ -5,9 +5,9 @@ db:
   name: "restapidb"
   user: "user"
   pass: "password"
-redis:
-  addr: "localhost:6379"
-  pass: "password"
+#redis:
+#  addr: "localhost:6379"
+#  pass: "password"
 trace:
   addr: "localhost:6831"
   service_name: "restapi"

@@ -3,7 +3,6 @@ package tracing
 import (
 	"context"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	"net/http/httptest"
 	"testing"
 )
 
@@ -36,20 +35,4 @@ func TestSpanID(t *testing.T) {
 
 func TestTraceID(t *testing.T) {
 	TraceID(context.Background())
-}
-
-func TestCopySpan(t *testing.T) {
-	CopySpan(context.Background(), context.TODO())
-}
-
-func TestInject(t *testing.T) {
-	Inject(context.Background(), httptest.NewRequest("POST", "https://domain.com", nil))
-}
-
-func TestHttpReqTextMapCarrier(t *testing.T) {
-	r := httptest.NewRequest("POST", "https://domain.com", nil)
-	h := httpReqTextMapCarrier{h: &r.Header}
-	h.Get("")
-	h.Set("", "")
-	h.Keys()
 }

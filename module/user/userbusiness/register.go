@@ -8,6 +8,7 @@ import (
 	"restapi/module/user/userstore"
 	"restapi/pkg/appconst"
 	"restapi/pkg/apperr"
+	"restapi/pkg/logging"
 	"restapi/pkg/salt"
 )
 
@@ -28,6 +29,7 @@ func (b *business) Register(ctx context.Context, req *usermodel.RegisterReq) (*u
 		Salt:           salt,
 	}
 
+	logging.FromContext(ctx).Info("start insert new user to db")
 	if err := b.userStore.Insert(ctx, &newUser); err != nil {
 		return nil, err
 	}

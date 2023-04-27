@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -97,35 +96,4 @@ func TraceID(ctx context.Context) string {
 		return sp.SpanContext().TraceID().String()
 	}
 	return ""
-}
-
-// CopySpan get the span from src context and inject into the dst context
-func CopySpan(dst context.Context, src context.Context) context.Context {
-	span := trace.SpanFromContext(src)
-	return trace.ContextWithSpan(dst, span)
-}
-
-// Inject injects span context that is associated with the given context in to http.Request
-func Inject(ctx context.Context, r *http.Request) {
-	otel.GetTextMapPropagator().Inject(ctx, &httpReqTextMapCarrier{h: &r.Header})
-}
-
-type httpReqTextMapCarrier struct {
-	h *http.Header
-}
-
-func (h *httpReqTextMapCarrier) Get(key string) string {
-	return h.h.Get(key)
-}
-
-func (h *httpReqTextMapCarrier) Set(key string, value string) {
-	h.h.Set(key, value)
-}
-
-func (h *httpReqTextMapCarrier) Keys() []string {
-	var result []string
-	for k, _ := range *h.h {
-		result = append(result, k)
-	}
-	return result
 }

@@ -6,6 +6,7 @@ import (
 	"restapi/module/user/usermodel"
 	"restapi/pkg/appconst"
 	"restapi/pkg/apperr"
+	"restapi/pkg/logging"
 	"restapi/pkg/response"
 )
 
@@ -25,9 +26,10 @@ func (t *transport) Login() gin.HandlerFunc {
 		}
 
 		// do business logic
+		logging.FromContext(c.Request.Context()).Info("start login business")
 		res, err := t.userBusiness.Login(c.Request.Context(), &req)
 		if err != nil {
-			t.log.Errorf("login error: %+v", err)
+			logging.FromContext(c.Request.Context()).Errorf("login error: %+v", err)
 			response.Error(c, err)
 			return
 		}

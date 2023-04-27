@@ -8,6 +8,7 @@ import (
 	"restapi/module/user/userstore"
 	"restapi/pkg/appconst"
 	"restapi/pkg/apperr"
+	"restapi/pkg/logging"
 	"restapi/pkg/tokenprovider"
 )
 
@@ -20,6 +21,8 @@ func (b *business) Login(ctx context.Context, req *usermodel.LoginReq) (*usermod
 
 		return nil, err
 	}
+
+	logging.FromContext(ctx).Infof("got user: %+v", user)
 
 	hashedPass := b.hasher.Hash(req.Password + user.Salt)
 	if user.HashedPassword != hashedPass {

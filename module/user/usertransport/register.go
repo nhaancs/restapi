@@ -6,6 +6,7 @@ import (
 	"restapi/module/user/usermodel"
 	"restapi/pkg/appconst"
 	"restapi/pkg/apperr"
+	"restapi/pkg/logging"
 	"restapi/pkg/response"
 )
 
@@ -24,9 +25,10 @@ func (t *transport) Register() func(*gin.Context) {
 			return
 		}
 
+		logging.FromContext(c.Request.Context()).Info("start register business")
 		res, err := t.userBusiness.Register(c.Request.Context(), &req)
 		if err != nil {
-			t.log.Errorf("register error: %+v", err)
+			logging.FromContext(c.Request.Context()).Errorf("register error: %+v", err)
 			response.Error(c, err)
 			return
 		}

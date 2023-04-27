@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/automaxprocs/maxprocs"
-	"go.uber.org/zap"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,7 +16,8 @@ import (
 	"restapi/module/user/usertransport"
 	"restapi/pkg/config"
 	"restapi/pkg/database"
-	"restapi/pkg/logger"
+	"restapi/pkg/logging"
+	"restapi/pkg/logging/zap"
 	"restapi/pkg/md5hasher"
 	"restapi/pkg/metric"
 	"restapi/pkg/tokenprovider/jwtprovider"
@@ -47,19 +48,16 @@ type appConfig struct {
 }
 
 func main() {
-	log, err := logger.New("RESTAPI")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer log.Sync()
+	// Init logger
+	l := zap.New(zap.ReleaseConfig())
+	logging.SetDefaultLogger(l)
 
-	if err := run(log); err != nil {
+	if err := run(l); err != nil {
 		log.Fatal("service error: ", err)
 	}
 }
 
-func run(log *zap.SugaredLogger) error {
+func run(log logging.Logger) error {
 	// Set the correct number of threads for the service based on what is available either by the machine or quotas.
 	opt := maxprocs.Logger(log.Infof)
 	if _, err := maxprocs.Set(opt); err != nil {
@@ -89,7 +87,7 @@ func run(log *zap.SugaredLogger) error {
 	r.Use(
 		gin.Recovery(),
 		middleware.Tracing(),
-		middleware.Logging(log),
+		middleware.Logging(),
 		middleware.Metric(),
 	)
 	v1 := r.Group("v1")
@@ -109,13 +107,11 @@ func run(log *zap.SugaredLogger) error {
 
 	// setup user
 	userBusiness := userbusiness.New(
-		log,
 		userstore.New(db),
 		jwtprovider.New(cfg.Auth.Secret),
 		md5hasher.New(),
 	)
 	userTransport := usertransport.New(
-		log,
 		userBusiness,
 	)
 	userTransport.SetupRoutes(v1)

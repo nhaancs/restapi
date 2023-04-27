@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"io"
 	"net/url"
+	"restapi/pkg/logging"
 	"restapi/pkg/tracing"
 	"time"
 )
@@ -26,7 +26,7 @@ func (w bodyLogWriter) WriteString(s string) (int, error) {
 	return w.ResponseWriter.WriteString(s)
 }
 
-func Logging(log *zap.SugaredLogger) func(c *gin.Context) {
+func Logging() func(c *gin.Context) {
 	ginPath := func(c *gin.Context) string {
 		if c.FullPath() != "" {
 			return c.FullPath()
@@ -36,20 +36,31 @@ func Logging(log *zap.SugaredLogger) func(c *gin.Context) {
 
 	return func(c *gin.Context) {
 		ctx, start := c.Request.Context(), time.Now()
-		l := log.With("trace_id", tracing.TraceID(ctx), "http.server.request_path", ginPath(c))
+		ctx, l := logging.WithFields(ctx, map[string]interface{}{
+			"trace_id":                 tracing.TraceID(ctx),
+			"http.server.request_path": ginPath(c),
+		})
 		body := getReqBody(c)
 
-		l.With("http.server.method", c.Request.Method, "http.server.client_ip", c.ClientIP(), "payload", body).
-			Infof("server: REQUEST")
+		l.WithFields(map[string]interface{}{
+			"http.server.method":    c.Request.Method,
+			"http.server.client_ip": c.ClientIP(),
+			"payload":               body,
+		}).Infof("server: REQUEST")
 
+		c.Request = c.Request.WithContext(ctx)
 		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw
 		c.Next()
 
-		l = l.With("http.server.status", c.Writer.Status(), "http.server.latency", time.Since(start).String(), "payload", blw.body.String())
+		l = l.WithFields(map[string]interface{}{
+			"http.server.status":  c.Writer.Status(),
+			"http.server.latency": time.Since(start).String(),
+			"payload":             blw.body.String(),
+		})
 
 		if len(c.Errors) > 0 {
-			l = l.With("error", c.Errors)
+			l = l.WithField("error", c.Errors)
 		}
 
 		if c.Writer.Status() >= 500 {

@@ -3,7 +3,6 @@ package usertransport
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"restapi/module/user/usermodel"
 )
 
@@ -13,16 +12,13 @@ type UserBusiness interface {
 }
 
 type transport struct {
-	log          *zap.SugaredLogger
 	userBusiness UserBusiness
 }
 
 func New(
-	log *zap.SugaredLogger,
 	userBusiness UserBusiness,
 ) *transport {
 	return &transport{
-		log:          log,
 		userBusiness: userBusiness,
 	}
 }
