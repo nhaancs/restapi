@@ -108,10 +108,11 @@ func run(log logging.Logger) error {
 	defer db.Close()
 	metric.RegisterDB(db.DB, cfg.DB.Name)
 
+	jwtProvider := jwtprovider.New(cfg.Auth.Secret)
 	// setup user
 	userBusiness := userbusiness.New(
 		userstore.New(db),
-		jwtprovider.New(cfg.Auth.Secret),
+		jwtProvider,
 		md5hasher.New(),
 	)
 	userTransport := usertransport.New(
@@ -121,8 +122,8 @@ func run(log logging.Logger) error {
 
 	// setup product
 	productBusiness := productbusiness.New(productstore.New(db))
-	productTranport := producttransport.New(productBusiness)
-	productTranport.SetupRoutes(v1)
+	productTransport := producttransport.New(productBusiness, jwtProvider)
+	productTransport.SetupRoutes(v1)
 
 	// Construct a server to service the requests.
 	app := http.Server{

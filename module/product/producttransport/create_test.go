@@ -34,6 +34,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			},
 			status: http.StatusOK,
 			mock: func() {
+				s.tokenProvider.On("Validate", mock.Anything).Return(nil, nil).Times(1)
 				s.productBusiness.On("Create", mock.Anything, mock.Anything).Return(&productmodel.CreateRes{}, nil).Times(1)
 			},
 		},
@@ -44,6 +45,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			},
 			status: http.StatusBadRequest,
 			mock: func() {
+				s.tokenProvider.On("Validate", mock.Anything).Return(nil, nil).Times(1)
 			},
 		},
 		{
@@ -56,6 +58,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			},
 			status: http.StatusBadRequest,
 			mock: func() {
+				s.tokenProvider.On("Validate", mock.Anything).Return(nil, nil).Times(1)
 			},
 		},
 		{
@@ -68,6 +71,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			mock: func() {
 				s.productBusiness.On("Create", mock.Anything, mock.Anything).
 					Return(nil, apperr.Wrap(nil, appconst.CodeBadRequest, "", http.StatusBadRequest)).Times(1)
+				s.tokenProvider.On("Validate", mock.Anything).Return(nil, nil).Times(1)
 			},
 		},
 	}
@@ -81,6 +85,7 @@ func (s *transportSuite) TestTransportSuite_Register() {
 			c.mock()
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodPost, "/v1/products", c.args())
+			req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOjB9LCJleHAiOjE3MTQxNzMzNjYsImlhdCI6MTY4MjYzNzM2Nn0.H_RdlCzmiv17k3e9IYeciXoZg4N_pz59ECqVaiK5ORY")
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, c.status, w.Code)

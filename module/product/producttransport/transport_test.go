@@ -9,6 +9,7 @@ import (
 
 type transportSuite struct {
 	suite.Suite
+	tokenProvider    *pTMock.TokenProvider
 	productBusiness  *pTMock.ProductBusiness
 	productTransport *transport
 }
@@ -16,7 +17,8 @@ type transportSuite struct {
 func (s *transportSuite) SetupTest() {
 	// Init suite
 	s.productBusiness = new(pTMock.ProductBusiness)
-	s.productTransport = New(s.productBusiness)
+	s.tokenProvider = new(pTMock.TokenProvider)
+	s.productTransport = New(s.productBusiness, s.tokenProvider)
 }
 
 func TestTransportSuite(t *testing.T) {
