@@ -23,4 +23,4 @@
     |--userstore
     |--usermodel
 ```
-![project-struture](./project-structure.jpg)
+![project-structure](./project-structure.jpg)
