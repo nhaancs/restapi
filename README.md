@@ -17,10 +17,10 @@
    |--productbusiness: handle the business logic
    |--productstore: handle database logic
    |--productmodel: contain models in the module
-|--`user`
-    |--producttransport
-    |--productbusiness
-    |--productstore
-    |--productmodel
+|--user
+    |--usertransport
+    |--userbusiness
+    |--userstore
+    |--usermodel
 ```
 ![project-struture](./project-structure.jpg)
