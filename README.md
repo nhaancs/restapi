@@ -1,7 +1,7 @@
 # RESTAPI
 
 ## Getting started
-- Setup environment: `make env`
+- Setup environment: `make envup`
 - Run migrations: `make migrate`
 - Run the service: `make run`
 - Check other commands in the `Makefile` file
