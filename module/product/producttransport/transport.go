@@ -11,6 +11,10 @@ import (
 type (
 	ProductBusiness interface {
 		Create(ctx context.Context, req *productmodel.CreateReq) (*productmodel.CreateRes, error)
+		Update(ctx context.Context, req *productmodel.UpdateReq) (*productmodel.UpdateRes, error)
+		List(ctx context.Context, req *productmodel.ListReq) (*productmodel.ListRes, error)
+		Detail(ctx context.Context, req *productmodel.DetailReq) (*productmodel.DetailRes, error)
+		Delete(ctx context.Context, req *productmodel.DeleteReq) (*productmodel.DeleteRes, error)
 	}
 	TokenProvider interface {
 		Validate(token string) (*tokenprovider.TokenPayload, error)
@@ -34,5 +38,9 @@ func New(
 
 func (t *transport) SetupRoutes(r *gin.RouterGroup) {
 	users := r.Group("products")
+	users.GET(":id", t.Detail())
+	users.GET("", t.List())
 	users.POST("", middleware.Auth(t.tokenProvider), t.Create())
+	users.PUT(":id", middleware.Auth(t.tokenProvider), t.Update())
+	users.DELETE(":id", middleware.Auth(t.tokenProvider), t.Delete())
 }

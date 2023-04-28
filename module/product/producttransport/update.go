@@ -8,12 +8,13 @@ import (
 	"restapi/pkg/apperr"
 	"restapi/pkg/logging"
 	"restapi/pkg/response"
+	"strconv"
 )
 
-func (t *transport) Create() func(*gin.Context) {
+func (t *transport) Update() func(*gin.Context) {
 	return func(c *gin.Context) {
 		// parse request body
-		var req productmodel.CreateReq
+		var req productmodel.UpdateReq
 		if err := c.ShouldBindJSON(&req); err != nil {
 			response.Error(c, apperr.Wrap(err, appconst.CodeBadRequest, "bad request", http.StatusBadRequest))
 			return
@@ -25,8 +26,16 @@ func (t *transport) Create() func(*gin.Context) {
 			return
 		}
 
-		logging.FromContext(c.Request.Context()).Info("start doing business logic")
-		res, err := t.productBusiness.Create(c.Request.Context(), &req)
+		id := c.Param("id")
+		idInt, err := strconv.ParseInt(id, 10, 64)
+		if err != nil || idInt <= 0 {
+			response.Error(c, apperr.Wrap(err, appconst.CodeBadRequest, "invalid id", http.StatusBadRequest))
+			return
+		}
+		req.Id = idInt
+
+		logging.FromContext(c.Request.Context()).Infof("start doing business logic: %+v", req)
+		res, err := t.productBusiness.Update(c.Request.Context(), &req)
 		if err != nil {
 			logging.FromContext(c.Request.Context()).Errorf("error: %+v", err)
 			response.Error(c, err)

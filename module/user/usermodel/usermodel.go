@@ -47,8 +47,8 @@ type LoginRes struct {
 }
 
 type User struct {
-	Id             int64
-	Username       string
-	HashedPassword string
-	Salt           string
+	Id             int64  `json:"id"`
+	Username       string `json:"username"`
+	HashedPassword string `json:"-"`
+	Salt           string `json:"-"`
 }

@@ -15,8 +15,82 @@ type ProductStore struct {
 	mock.Mock
 }
 
+// Delete provides a mock function with given fields: ctx, id
+func (_m *ProductStore) Delete(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FindById provides a mock function with given fields: ctx, id
+func (_m *ProductStore) FindById(ctx context.Context, id int64) (*productmodel.Product, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 *productmodel.Product
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *productmodel.Product); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*productmodel.Product)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Insert provides a mock function with given fields: ctx, product
 func (_m *ProductStore) Insert(ctx context.Context, product *productmodel.Product) error {
+	ret := _m.Called(ctx, product)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *productmodel.Product) error); ok {
+		r0 = rf(ctx, product)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Select provides a mock function with given fields: ctx, offset, limit
+func (_m *ProductStore) Select(ctx context.Context, offset int, limit int) ([]*productmodel.Product, error) {
+	ret := _m.Called(ctx, offset, limit)
+
+	var r0 []*productmodel.Product
+	if rf, ok := ret.Get(0).(func(context.Context, int, int) []*productmodel.Product); ok {
+		r0 = rf(ctx, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*productmodel.Product)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, int, int) error); ok {
+		r1 = rf(ctx, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Update provides a mock function with given fields: ctx, product
+func (_m *ProductStore) Update(ctx context.Context, product *productmodel.Product) error {
 	ret := _m.Called(ctx, product)
 
 	var r0 error

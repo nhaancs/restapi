@@ -37,6 +37,98 @@ func (_m *ProductBusiness) Create(ctx context.Context, req *productmodel.CreateR
 	return r0, r1
 }
 
+// Delete provides a mock function with given fields: ctx, req
+func (_m *ProductBusiness) Delete(ctx context.Context, req *productmodel.DeleteReq) (*productmodel.DeleteRes, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *productmodel.DeleteRes
+	if rf, ok := ret.Get(0).(func(context.Context, *productmodel.DeleteReq) *productmodel.DeleteRes); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*productmodel.DeleteRes)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *productmodel.DeleteReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Detail provides a mock function with given fields: ctx, req
+func (_m *ProductBusiness) Detail(ctx context.Context, req *productmodel.DetailReq) (*productmodel.DetailRes, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *productmodel.DetailRes
+	if rf, ok := ret.Get(0).(func(context.Context, *productmodel.DetailReq) *productmodel.DetailRes); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*productmodel.DetailRes)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *productmodel.DetailReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// List provides a mock function with given fields: ctx, req
+func (_m *ProductBusiness) List(ctx context.Context, req *productmodel.ListReq) (*productmodel.ListRes, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *productmodel.ListRes
+	if rf, ok := ret.Get(0).(func(context.Context, *productmodel.ListReq) *productmodel.ListRes); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*productmodel.ListRes)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *productmodel.ListReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Update provides a mock function with given fields: ctx, req
+func (_m *ProductBusiness) Update(ctx context.Context, req *productmodel.UpdateReq) (*productmodel.UpdateRes, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *productmodel.UpdateRes
+	if rf, ok := ret.Get(0).(func(context.Context, *productmodel.UpdateReq) *productmodel.UpdateRes); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*productmodel.UpdateRes)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *productmodel.UpdateReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewProductBusiness interface {
 	mock.TestingT
 	Cleanup(func())
