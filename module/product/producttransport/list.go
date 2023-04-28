@@ -5,12 +5,17 @@ import (
 	"restapi/module/product/productmodel"
 	"restapi/pkg/logging"
 	"restapi/pkg/response"
+	"strconv"
 )
 
 func (t *transport) List() func(*gin.Context) {
 	return func(c *gin.Context) {
-		offset := c.GetInt("id")
-		limit := c.GetInt("id")
+		offsetStr := c.Query("offset")
+		offset, _ := strconv.Atoi(offsetStr)
+
+		limitStr := c.Query("limit")
+		limit, _ := strconv.Atoi(limitStr)
+
 		// validate request
 		if limit <= 0 {
 			limit = 20
