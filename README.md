@@ -23,4 +23,4 @@
     |--`productstore`
     |--`productmodel`
 
-![project-struture](./project-struture.jpg)
+![project-struture](./project-structure.jpg)
